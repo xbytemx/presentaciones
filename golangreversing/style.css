@@ -1,0 +1,45 @@
+body {
+    background: url('./img/bg.png');
+    background-size:100%;
+}
+
+
+.reveal p {
+    text-align: left;
+}
+
+.reveal p img {
+    max-width:85%;
+    display: block;
+    margin-left: auto;
+    margin-right: auto;
+    height:auto;
+    text-align: center;
+}
+.reveal .footer {
+  background-position: center top;
+  bottom: 0px;
+  font-size: 0.50em;
+  height: 30px;
+  padding: 10px;
+  padding-left: 20px;
+  position: absolute;
+  width: 100%;
+  z-index: 10; }
+  .reveal .footer .conference {
+    background-image: url("./img/logo.jpg");
+    background-repeat: no-repeat;
+    background-size: 40px;
+    margin-right: 35px;
+    padding-left: 50px;
+    float: left;
+    height: 28px;
+    margin-top: -2px; }
+  .reveal .footer .speaker {
+    background-image: url("./img/twitter.png");
+    background-position: 0 -11px;
+    background-repeat: no-repeat;
+    background-size: 40px;
+    float: right;
+    margin-right: 50px;
+    padding-left: 50px; }
