@@ -37,8 +37,8 @@ Consultor de Ciberseguridad at ksquareinc, casado, 31 años
 
 ### Agenda
 1. ¿Qué es un backdoor?
-2. ¿Que tipos de backdoors podemos encontrar?
-3. Maquina virtual de pruebas
+2. ¿Qué tipos de backdoors podemos encontrar?
+3. ¿Rootkit ?
 4. Reptile Wins.
 5. BONUS: Analisis forense de una maquina comprometida
 ---
@@ -64,7 +64,7 @@ Consultor de Ciberseguridad at ksquareinc, casado, 31 años
 
 <!-- .slide: data-background="./img/titles.png"; -->                                             
 ### ¿Que tipos de backdoors podemos encontrar?
----  
+---
 
 
 ### Backdooring
@@ -91,11 +91,16 @@ Estar monitoreando de manera continua estos archivos nos permite enterarnos de l
 ---
 
 
-### 
+### Rootkits... 90's are back
+* Software que se esconde dentro de las maquinas
+* /proc? LKM? R: Syscalls.
+* Enyelkm, Diamorphine, Reptile
 ---
 
-
-### 
+### git clone and fun
+```
+git clone https://github.com/f0rb1dd3n/Reptile
+```
 ---
 
 
