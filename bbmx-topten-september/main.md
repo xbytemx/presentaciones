@@ -3,17 +3,17 @@ title: 'Bug Bounty MX - Top Ten September'
 theme: 'night.css'
 highlightTheme: monokai
 css: 'style.css'
-template: 'template.html'
 revealOptions:
     transition: 'slide'
     controls: false
 ---
+
 <!-- .slide: data-background="./img/portada.png"; data-background-opacity="0.50";-->
 ## Bug Bounty MX: Top Ten September 
 #### xbytemx
-
-
 ---
+
+
 <!-- .slide: style="text-align: left;" -->
 ### Objetivo
 
@@ -27,7 +27,7 @@ revealOptions:
 3. **Sep/7** *Aditya Dixit* - `From Android Static Analysis to RCE on Prod`
 4. **Sep/7** *Zohar Shachar* - `XSS->Fix->Bypass: 10000$ bounty in Google Maps`
 5. **Sep/17** *Novan Aziz Ramadhan* - `My First Bug Bounty From Bug Bounty Platform redstorm.io`
----
+----
 
 
 ### Agenda
