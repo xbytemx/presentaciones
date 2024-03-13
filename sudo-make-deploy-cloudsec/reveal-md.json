@@ -1,0 +1,7 @@
+{
+	"title": "sudo make deploy-cloud-security",
+    "theme": "night.css",
+    "highlightTheme": "monokai",
+    "css": "style.css",
+    "template": "template.html"
+}
