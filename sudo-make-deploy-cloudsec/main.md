@@ -19,7 +19,7 @@ Lead Security Systems Engineer @ EPAM Systems <!-- .element: class="fragment" --
 ### 🗂️ Agenda (1/2)
 
 - **Cloud Security** (surprise!)
-- The real value of the *low-hanging* fruits (thx h1)
+- The value of the *low-hanging* fruits (thx h1)
 - *DIY* and make your own tools
 - Cloud Security Engineering
   - Infrastructure as Code (**IaC**)
@@ -35,7 +35,7 @@ Lead Security Systems Engineer @ EPAM Systems <!-- .element: class="fragment" --
   - Secure baseline for AWS Accounts, GCP Projects, Azure Subscriptions
   - Who is the owner of this resource? *Tag Enforcement*
   - Who should be informed? *Majordomo*
-- *Demo*: Golden Images
+  - Golden Images
 - CloudSec Roadmap
 
 
@@ -48,8 +48,9 @@ Lead Security Systems Engineer @ EPAM Systems <!-- .element: class="fragment" --
 ### Quick Definition
 
 > Cloud security is the set of cybersecurity measures used to protect cloud-based applications, data, and infrastructure. 
+> 
+> [https://cloud.google.com/learn/what-is-cloud-security](https://cloud.google.com/learn/what-is-cloud-security#section-2)
 
-[https://cloud.google.com/learn/what-is-cloud-security](https://cloud.google.com/learn/what-is-cloud-security#section-2)
 
 
 ---
@@ -71,7 +72,7 @@ Lead Security Systems Engineer @ EPAM Systems <!-- .element: class="fragment" --
 
 ---
 <!-- .slide: data-background="./img/titles.png"; -->
-## The real value of the low-hanging fruits (thx h1)
+## The value of the low-hanging fruits (thx h1)
 
 
 ---
@@ -98,7 +99,8 @@ Lead Security Systems Engineer @ EPAM Systems <!-- .element: class="fragment" --
 - Cloud Security Reviews <!-- .element: class="fragment" -->
 - The gap between security team capacity and cloud security needs is huge <!-- .element: class="fragment" -->
 
-Cloud security;  <!-- .element: class="fragment" --> **Self Service**  <!-- .element: class="fragment" --> and **Flexible**?  <!-- .element: class="fragment" -->
+
+#### Cloud security;  <!-- .element: class="fragment" --> **Self Service**  <!-- .element: class="fragment highlight-blue" --> and **Flexible**?  <!-- .element: class="fragment highlight-blue" -->
 
 
 ---
@@ -189,11 +191,41 @@ Event-Driven Architecture ([EDA](https://aws.amazon.com/event-driven-architectur
 
 
 ---
+<!-- .slide: data-auto-animate="true"; -->
+
+```hcl []
+terraform {
+  required_version = ">= 1.0"
+  required_providers {
+    aws = {
+      source  = "hashicorp/aws"
+      version = "~> 5.0"
+    }
+    random = {
+      source  = "hashicorp/random"
+      version = ">= 2.0"
+    }
+  }
+
+  backend "s3" {
+    profile        = "hackgdl"
+    bucket         = "hackgdl-tfstate"
+    key            = "hackgdl/terraform.tfstate"
+    encrypt        = true
+    region         = "us-east-1"
+    dynamodb_table = "hackgdl-tflock"
+  }
+}
+```
+<!-- .element: data-id="code-animation" stretch-->
+
+
+---
 ### Cloud Native
 
 > Cloud native technologies empower organizations to build and run scalable applications in modern, dynamic environments such as public, private, and hybrid clouds. Containers, service meshes, microservices, immutable infrastructure, and declarative APIs exemplify this approach.
-
-[https://github.com/cncf/toc/blob/main/DEFINITION.md](https://github.com/cncf/toc/blob/main/DEFINITION.md)
+> 
+> [https://github.com/cncf/toc/blob/main/DEFINITION.md](https://github.com/cncf/toc/blob/main/DEFINITION.md)
 
 
 ---
@@ -215,20 +247,40 @@ Event-Driven Architecture ([EDA](https://aws.amazon.com/event-driven-architectur
 
 
 ---
-### Secure baseline for AWS Accounts, GCP Projects, Azure Subscriptions
+### Secure baseline configurator for AWS Accounts, GCP Projects, Azure Subscriptions
+
+- Configure roles for security services (remediation, monitoring, operations, etc)
+- GitOps; control infra changes from code
+- Onboarding and offboarding!
+- Cloud-Agnostic Approach
+- **Remember:** Account level configuration (MFA, Logs, Costs, IAM, etc)
 
 
 ---
 ### Tag Enforcement
 
+- Hey CFO!
+- Service Catalog
+- How many days should you wait for a team to tag their assets?
+- Detect, notify, destroy.
+- REALLY, DESTROY!<!-- .element: class="fragment" -->
+- But first, a backup. Then is time to nuke <!-- .element: class="fragment" -->
+
 
 ---
 ### Majordomo
 
+- First Point of Contact.
+- More GitOps
+- Trusted source
+- Distribution lists
+- Communication channels (slack, opsgenie, etc)
+- Alerts and notifications
+
 
 ---
 <!-- .slide: data-background="./img/titles.png"; -->
-## Demo: Golden Images
+## Golden Images
 
 
 ---
@@ -239,14 +291,6 @@ Event-Driven Architecture ([EDA](https://aws.amazon.com/event-driven-architectur
 - Hardening
 - Security tools
 - Easy to integrate
-
-
----
-### Technology Stack
-
-`terraform`. 
-`packer`.
-`GitLab CI`.
 
 
 ---
