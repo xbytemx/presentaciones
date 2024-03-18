@@ -25,7 +25,7 @@ Lead Security Systems Engineer @ EPAM Systems <!-- .element: class="fragment" --
   - Infrastructure as Code (**IaC**)
   - Event-Driven Architecture
   - Cloud Native
-- *Demo*: Fixing S3 bucket subdomain takeovers
+- Fixing S3 bucket subdomain takeovers
 
 
 ---
@@ -164,63 +164,6 @@ Event-Driven Architecture ([EDA](https://aws.amazon.com/event-driven-architectur
 
 
 ---
-<!-- .slide: data-auto-animate="true"; -->
-
-```js [|1,3|2]
-  let planets = [
-      { name: 'mars', diameter: 6779 },
-      { name: 'mercurio', diameter: 6779 },
-      { name: 'earth', diameter: 12742 },
-      { name: 'jupiter', diameter: 139820 }
-    ]
-```
-<!-- .element: data-id="code-animation"; -->
-
-
----
-<!-- .slide: data-auto-animate="true"; -->
-
-```js []
-  let planets = [
-      { name: 'mars', diameter: 6779 },
-      { name: 'earth', diameter: 12742 },
-      { name: 'jupiter', diameter: 139820 }
-    ]
-```
-<!-- .element: data-id="code-animation"; -->
-
-
----
-<!-- .slide: data-auto-animate="true"; -->
-
-```hcl []
-terraform {
-  required_version = ">= 1.0"
-  required_providers {
-    aws = {
-      source  = "hashicorp/aws"
-      version = "~> 5.0"
-    }
-    random = {
-      source  = "hashicorp/random"
-      version = ">= 2.0"
-    }
-  }
-
-  backend "s3" {
-    profile        = "hackgdl"
-    bucket         = "hackgdl-tfstate"
-    key            = "hackgdl/terraform.tfstate"
-    encrypt        = true
-    region         = "us-east-1"
-    dynamodb_table = "hackgdl-tflock"
-  }
-}
-```
-<!-- .element: data-id="code-animation" stretch-->
-
-
----
 ### Cloud Native
 
 > Cloud native technologies empower organizations to build and run scalable applications in modern, dynamic environments such as public, private, and hybrid clouds. Containers, service meshes, microservices, immutable infrastructure, and declarative APIs exemplify this approach.
@@ -237,8 +180,416 @@ terraform {
 
 
 ---
-<!-- .slide: data-background="./img/titles.png"; -->
-## Demo: Fixing S3 bucket subdomain takeovers
+
+### Fixing S3 bucket subdomain takeovers
+
+
+---
+![](./img/diagram.s3bto.png) <!-- .element style="border: 0; background: None; box-shadow: None" width="50%" -->
+
+
+---
+<!-- .slide: data-auto-animate="true"; -->
+
+```text
+.
+├── Makefile
+├── builds
+│   ├── s3to_defender
+│   │   └── bootstrap
+│   └── s3to_defender.zip
+├── go.mod
+├── go.sum
+├── internal
+│   └── logging.go
+├── lambdas
+│   └── s3to_defender
+│       └── main.go
+└── terraform
+    ├── builds
+    ├── eventbridge.tf
+    ├── locals.tf
+    ├── modules
+    │   └── create_lambda
+    │       ├── main.tf
+    │       ├── outputs.tf
+    │       └── variables.tf
+    ├── providers.tf
+    ├── s3to_defender.tf
+    ├── sqs.tf
+    └── terraform.tf
+```
+<!-- .element: data-id="code-animation" stretch-->
+
+
+---
+<!-- .slide: data-auto-animate="true"; -->
+
+```make []
+build:
+	@cd lambdas; \
+	for lambda_name in `ls .`; do \
+		cd $$lambda_name; \
+		GOOS=linux GOARCH=amd64 CGO_ENABLED=0 go build -ldflags='-s -w' -o ../../builds/$$lambda_name/bootstrap -tagslambda.norpc ; \
+		zip ../../builds/$$lambda_name.zip ../../builds/$$lambda_name/bootstrap ; \
+		cd .. ; \
+	done
+
+deploy: build
+	@cd terraform ; \
+	terraform init ; \
+	terraform fmt -recursive && terraform validate ; \
+	terraform apply -auto-approve ; \
+```
+<!-- .element: data-id="code-animation" -->
+
+
+---
+<!-- .slide: data-auto-animate="true"; -->
+
+```hcl [|11-15|25|35-41]
+#Using terraform eventbridge module
+module "eventbridge" {
+  source  = "terraform-aws-modules/eventbridge/aws"
+  version = "3.2.3"
+
+
+  bus_name = "hackgdl-event-bus"
+
+  create_permissions = true
+
+  attach_sqs_policy = true
+  sqs_target_arns = [
+    aws_sqs_queue.queue.arn,
+    aws_sqs_queue.dlq.arn
+  ]
+
+  rules = {
+    s3_deletebucket_events = {
+      description = "Capture all S3 DeleteBucket events",
+      event_pattern = jsonencode({
+        "source" : ["aws.cloudtrail"],
+        "detail" : {
+          "eventSource" : ["s3.amazonaws.com"],
+          "errorCode" : [{ "exists" : false }],
+          "eventName" : ["DeleteBucket"]
+        }
+      })
+      enabled = true
+    }
+  }
+
+  targets = {
+    s3_deletebucket_events = [
+      {
+        name            = "send-events-to-sqs"
+        arn             = aws_sqs_queue.queue.arn
+        dead_letter_arn = aws_sqs_queue.dlq.arn
+        target_id       = "send-events-to-sqs"
+      }
+    ]
+  }
+
+}
+```
+<!-- .element: data-id="code-animation" -->
+
+
+---
+<!-- .slide: data-auto-animate="true"; -->
+
+```hcl []
+#Create SQS objects to allow receiving messages from eventbridge
+resource "aws_sqs_queue" "dlq" {
+  name = "hackgdl-dlq"
+}
+
+resource "aws_sqs_queue" "queue" {
+  name = "hackgdl-queue"
+}
+
+resource "aws_sqs_queue_policy" "queue" {
+  queue_url = aws_sqs_queue.queue.id
+  policy    = data.aws_iam_policy_document.queue.json
+}
+
+data "aws_iam_policy_document" "queue" {
+  statement {
+    sid     = "AllowSendMessage"
+    actions = ["sqs:SendMessage"]
+
+    principals {
+      type        = "Service"
+      identifiers = ["events.amazonaws.com"]
+    }
+
+    resources = [aws_sqs_queue.queue.arn]
+  }
+}
+```
+<!-- .element: data-id="code-animation" -->
+
+
+
+---
+<!-- .slide: data-auto-animate="true"; -->
+
+```hcl []
+module "lambda_s3bto_defender" {
+  source = "./modules/create_lambda"
+
+  function_name  = "${local.basename}_s3bto_defender"
+  source_path    = "../builds/s3to_defender"
+  sqs_source_arn = aws_sqs_queue.queue.arn
+  extra_policies = []
+}
+```
+<!-- .element: data-id="code-animation" -->
+
+
+---
+<!-- .slide: data-auto-animate="true"; -->
+
+```hcl [|5-9|13-18|31-42]
+module "lambda" {
+  source  = "terraform-aws-modules/lambda/aws"
+  version = "7.2.2"
+
+  function_name = var.function_name
+  description   = "Lambda generated for ${var.source_path}"
+  handler       = "bootstrap"
+  runtime       = "provided.al2023"
+  publish       = true
+
+  source_path = var.source_path
+
+  allowed_triggers = {
+    sqs = {
+      principal  = "sqs.amazonaws.com"
+      source_arn = var.sqs_source_arn
+    }
+  }
+
+  event_source_mapping = {
+    sqs = {
+      event_source_arn = var.sqs_source_arn
+    }
+  }
+
+  create_current_version_allowed_triggers = false
+
+  attach_policies    = true
+  number_of_policies = 1 + length(var.extra_policies)
+
+  policies = merge(
+    ["arn:aws:iam::aws:policy/service-role/AWSLambdaSQSQueueExecutionRole"],
+    var.extra_policies)
+
+  attach_policy_statements = true
+  policy_statements = {
+    cloudfront = {
+      effect    = "Allow",
+      actions   = ["cloudfront:ListDistributions", "cloudfront:GetDistributionConfig"],
+      resources = ["*"]
+    }
+  }
+
+  environment_variables = {
+    KILLSWITCH = "false"
+  }
+
+}
+```
+<!-- .element: data-id="code-animation" -->
+
+
+---
+<!-- .slide: data-auto-animate="true"; -->
+
+```go []
+package main
+
+import (
+	"context"
+	"encoding/json"
+	"fmt"
+
+	"github.com/aws/aws-lambda-go/events"
+	"github.com/aws/aws-lambda-go/lambda"
+	"github.com/aws/aws-sdk-go-v2/config"
+	"github.com/aws/aws-sdk-go-v2/service/cloudfront"
+	"github.com/sirupsen/logrus"
+	"gitlab.com/xbytemx/hackgdl/internal"
+)
+
+var log *logrus.Entry
+
+func s3toDefender(ctx context.Context, sqsEvent events.SQSEvent) error {
+	return nil
+}
+
+func main() {
+	lambda.Start(s3toDefender)
+}
+```
+<!-- .element: data-id="code-animation" -->
+
+
+---
+<!-- .slide: data-auto-animate="true"; -->
+
+```go []
+package main
+
+import (
+	"context"
+	"encoding/json"
+	"fmt"
+
+	"github.com/aws/aws-lambda-go/events"
+	"github.com/aws/aws-lambda-go/lambda"
+	"github.com/aws/aws-sdk-go-v2/config"
+	"github.com/aws/aws-sdk-go-v2/service/cloudfront"
+	"github.com/sirupsen/logrus"
+	"gitlab.com/xbytemx/hackgdl/internal"
+)
+
+var log *logrus.Entry
+
+func s3toDefender(ctx context.Context, sqsEvent events.SQSEvent) error {
+	aws_id := internal.RequestID(ctx)
+	log = internal.NewLogger().WithField("aws_id", aws_id)
+
+	if len(sqsEvent.Records) == 0 {
+		log.Fatalf("received empty event")
+		return fmt.Errorf("received empty event")
+	}
+
+	return nil
+}
+
+func main() {
+	lambda.Start(s3toDefender)
+}
+```
+<!-- .element: data-id="code-animation" -->
+
+
+---
+<!-- .slide: data-auto-animate="true"; -->
+
+```go []
+package main
+
+import (
+	"context"
+	"encoding/json"
+	"fmt"
+
+	"github.com/aws/aws-lambda-go/events"
+	"github.com/aws/aws-lambda-go/lambda"
+	"github.com/aws/aws-sdk-go-v2/config"
+	"github.com/aws/aws-sdk-go-v2/service/cloudfront"
+	"github.com/sirupsen/logrus"
+	"gitlab.com/xbytemx/hackgdl/internal"
+)
+
+var log *logrus.Entry
+
+func s3toDefender(ctx context.Context, sqsEvent events.SQSEvent) error {
+	aws_id := internal.RequestID(ctx)
+	log = internal.NewLogger().WithField("aws_id", aws_id)
+
+	if len(sqsEvent.Records) == 0 {
+		log.Fatalf("received empty event")
+		return fmt.Errorf("received empty event")
+	}
+
+	cfg, err := config.LoadDefaultConfig(context.TODO(), config.WithRegion("us-east-1"))
+	if err != nil {
+		log.Fatalf("unable to load SDK config, %v", err)
+		return err
+	}
+
+	svc := cloudfront.NewFromConfig(cfg)
+	return nil
+}
+
+func main() {
+	lambda.Start(s3toDefender)
+}
+```
+<!-- .element: data-id="code-animation" -->
+
+
+---
+<!-- .slide: data-auto-animate="true"; -->
+
+```go []
+package main
+
+import (
+	"context"
+	"encoding/json"
+	"fmt"
+
+	"github.com/aws/aws-lambda-go/events"
+	"github.com/aws/aws-lambda-go/lambda"
+	"github.com/aws/aws-sdk-go-v2/config"
+	"github.com/aws/aws-sdk-go-v2/service/cloudfront"
+	"github.com/sirupsen/logrus"
+	"gitlab.com/xbytemx/hackgdl/internal"
+)
+
+var log *logrus.Entry
+
+func s3toDefender(ctx context.Context, sqsEvent events.SQSEvent) error {
+	aws_id := internal.RequestID(ctx)
+	log = internal.NewLogger().WithField("aws_id", aws_id)
+
+	if len(sqsEvent.Records) == 0 {
+		log.Fatalf("received empty event")
+		return fmt.Errorf("received empty event")
+	}
+
+	cfg, err := config.LoadDefaultConfig(context.TODO(), config.WithRegion("us-east-1"))
+	if err != nil {
+		log.Fatalf("unable to load SDK config, %v", err)
+		return err
+	}
+
+	svc := cloudfront.NewFromConfig(cfg)
+
+	for _, message := range sqsEvent.Records {
+		var event map[string]interface{}
+		json.Unmarshal([]byte(message.Body), &event)
+
+		dists, err := svc.ListDistributions(context.TODO(), &cloudfront.ListDistributionsInput{})
+		if err != nil {
+			log.Fatalf("unable to list dists, %v", err)
+			return err
+		}
+
+		for _, dist := range dists.DistributionList.Items {
+			output, err := svc.GetDistributionConfig(context.TODO(), &cloudfront.GetDistributionConfigInput{Id: dist.Id})
+			if err != nil {
+				log.Fatalf("unable to get dist config, %v", err)
+				return err
+			}
+			for _, origin := range output.DistributionConfig.Origins.Items {
+	...
+			}
+		}
+
+	}
+	return nil
+}
+
+func main() {
+	lambda.Start(s3toDefender)
+}
+```
+<!-- .element: data-id="code-animation" -->
 
 
 ---
