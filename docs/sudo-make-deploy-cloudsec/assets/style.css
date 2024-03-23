@@ -1,5 +1,5 @@
 .reveal {
-    background: url('./img/bg.png');
+    background: url('../img/bg.png');
     background-size:100%;
 }
 
@@ -27,7 +27,7 @@
   z-index: 10; }
 
   .reveal .footer .speaker {
-    /*background-image: url("./img/twitter.png");*/
+    /*background-image: url("../img/twitter.png");*/
     background-position: 0 -11px;
     background-repeat: no-repeat;
     background-size: 40px;
@@ -36,7 +36,7 @@
     padding-left: 49px; }
 
   .reveal .footer .conference {
-    background-image: url("./img/logo.svg");
+    background-image: url("../img/logo.svg");
     background-position: 0 0 px;
     background-repeat: no-repeat;
     background-size: 24px;
