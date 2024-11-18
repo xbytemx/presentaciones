@@ -1,0 +1,23 @@
+{
+  "simplemenu": {
+    "scale": 0.5,
+    "flat": true
+  },
+  "drawer": {
+    "toggleDrawKey": "d",
+    "toggleBoardKey": "t",
+    "colors": [
+      "#fa1e0e",
+      "#8ac926",
+      "#1982c4",
+      "#ffca3a"
+    ],
+    "color": "#FF0000",
+    "pathSize": 4
+  },
+  "width": 1920,
+  "height": 1080,
+  "transition": "slide",
+  "controls": false,
+  "slideNumber": false
+}

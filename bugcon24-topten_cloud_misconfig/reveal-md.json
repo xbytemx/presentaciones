@@ -1,0 +1,12 @@
+{
+    "title": "10 ways to <redacted> in a MultiCloud Environment",
+    "theme": "css/night.css",
+    "highlightTheme": "monokai",
+    "css": "css/style.css",
+    "template": "templates/slides.html",
+    "scripts": [
+        "plugin/simplemenu/simplemenu.js",
+        "plugin/drawer/drawer.js",
+        "plugin.js"
+    ]
+}
