@@ -18,17 +18,17 @@ Lead Security Systems Engineer @ EPAM Systems <!-- .element: class="fragment" --
 <!-- .slide: data-state="hide-menubar"; -->
 ## 🗂️ Agenda
 
-01. MultiCloud Security Situation
-02. SSRF Explotation
-03. Exposed Services
-04. Takerovers
-05. Overpermissive
-06. Until You Remember
-07. Secure Baseline
-08. Ownership
-09. Leaks
-10. Enforcement
-11. DevOps
+01. MultiCloud Security Situation<!-- .element: class="animate__flipInX" -->
+02. SSRF Explotation<!-- .element: class="animate__flipInX" -->
+03. Exposed Services<!-- .element: class="animate__flipInX" -->
+04. Takerovers<!-- .element: class="animate__flipInX" -->
+05. Overpermissive<!-- .element: class="animate__flipInX" -->
+06. Until You Remember<!-- .element: class="animate__flipInX" -->
+07. Secure Baseline<!-- .element: class="animate__flipInX" -->
+08. Ownership<!-- .element: class="animate__flipInX" -->
+09. Leaks<!-- .element: class="animate__flipInX" -->
+10. Enforcement<!-- .element: class="animate__flipInX" -->
+11. DevOps<!-- .element: class="animate__flipInX" -->
 
 
 ---
