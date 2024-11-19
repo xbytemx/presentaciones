@@ -247,6 +247,20 @@ Source: https://www.tenable.com/blog/confusedfunction-a-privilege-escalation-vul
 
 
 ---
+### Least Privilege
+
+Don't go forward to "*", start with some Get or List, if apply.
+
+Use conditionals (AWS)
+
+Create custom roles (GCP)
+
+
+[https://repost.aws/knowledge-center/sqs-access-policy-least-privilege](https://repost.aws/knowledge-center/sqs-access-policy-least-privilege)
+[https://aquasecurity.github.io/tfsec/v1.0.0/checks/aws/iam/no-policy-wildcards/ ](https://aquasecurity.github.io/tfsec/v1.0.0/checks/aws/iam/no-policy-wildcards/ )
+
+
+---
 <!-- .slide: data-background="./_assets/img/bg.png"; data-state="hide-menubar"; data-name="Until"; -->
 ## Until You Remember
 
@@ -271,7 +285,7 @@ Source: https://www.tenable.com/blog/confusedfunction-a-privilege-escalation-vul
 - Verify the activity of the roles, is normal?
 - Service accounts are normal?
 
-- Are all the api calls normal? 
+- Are all the API calls normal? 
 - Which is the most wanted API call? 
 - Times for spikes are related to your operations?
 
