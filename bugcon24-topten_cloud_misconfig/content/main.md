@@ -19,7 +19,7 @@ Lead Security Systems Engineer @ EPAM Systems <!-- .element: class="fragment" --
 ## 🗂️ Agenda
 
 01. MultiCloud Security Situation<!-- .element: class="animate__flipInX" -->
-02. SSRF Explotation<!-- .element: class="animate__flipInX" -->
+02. Metadata Explotation<!-- .element: class="animate__flipInX" -->
 03. Exposed Services<!-- .element: class="animate__flipInX" -->
 04. Takerovers<!-- .element: class="animate__flipInX" -->
 05. Overpermissive<!-- .element: class="animate__flipInX" -->
@@ -89,10 +89,17 @@ Source: [Current state of Cloud Security, CSHub 2023](https://www.cshub.com/clou
 
 
 ---
-<!-- .slide: data-background="./_assets/img/bg.png"; data-state="hide-menubar"; data-name="SSRF"; -->
-## SSRF Explotation
+<!-- .slide: data-background="./_assets/img/bg.png"; data-state="hide-menubar"; data-name="Metadata"; -->
+## Metadata Explotation
 
 #### 169.254.169.254, are you there?<!-- .element: class="fragment animate__flipInX" -->
+
+
+---
+### Metadata Service
+
+- Gives information to the service or resource about the cloud context
+- Resources can be provided with an identity to the CSP (cloud service provider) using roles or service accounts via tokens
 
 
 ---
@@ -141,15 +148,52 @@ Source: https://github.com/swisskyrepo/PayloadsAllTheThings/blob/master/Server%2
 
 
 ---
-### AWS EC2 Protection
+### AWS Protection
 
 #### Enable IMDSv2
 
 > Note that if the EC2 instance is enforcing IMDSv2, according to the docs, the response of the PUT request will have a hop limit of 1, making impossible to access the EC2 metadata from a container inside the EC2 instance.
-> 
+>
 > Moreover, IMDSv2 will also block requests to fetch a token that include the X-Forwarded-For header. This is to prevent misconfigured reverse proxies from being able to access it.
 
 Source: https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/instance-metadata-v2-how-it-works.html
+
+
+---
+### GCP? Azure?
+
+GCP
+
+```default
+## Google Cloud (Header Sometimes Required)
+#  https://cloud.google.com/compute/docs/metadata
+#  - Requires the header "Metadata-Flavor: Google" or "X-Google-Metadata-Request: True" on API v1
+#  - Most endpoints can be accessed via the v1beta API without a header
+http://169.254.169.254/computeMetadata/v1/
+http://metadata.google.internal/computeMetadata/v1/
+http://metadata/computeMetadata/v1/
+
+http://metadata.google.internal/computeMetadata/v1/instance/service-accounts/default/token
+```
+
+Azure
+
+```defaul
+# Azure (Header Required)
+# Must contain the header "Metadata: true"
+# Must not contain an X-Forwarded-For header
+http://169.254.169.254/metadata/instance?api-version=2021-02-01
+```
+
+
+---
+<!-- .slide: data-background="./_assets/img/bug1.webp"; data-background-size="10%"; data-background-position="95% 15%"; -->
+### IMDScape (Fixed)
+
+- EKS nodes uses IMDS to fetch the K8S api token
+- Get token from IMDS, then use it on k8s api
+- With the token, you can interact at high level as the node permission
+- Permits you to login
 
 
 ---
@@ -160,26 +204,89 @@ Source: https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/instance-metadata-v2
 
 
 ---
-### Behind public storage...
+### Behind public storage ...
 
-#### Many cloud services are public 
+#### Many cloud services are public<!-- .element: class="fragment animate__bounceInLeft"  -->
 
-- Anyone can invoke my function?
-- The image registries should be open?
-- Anyone can publish/subscribe to your queue?
-- Backups, snapshots can be wide open by mistake...
+- Anyone can invoke my function?<!-- .element: class="fragment custom blur " -->
+- The image registries should be open?<!-- .element: class="fragment custom blur " -->
+- Anyone can publish/subscribe to your queue?<!-- .element: class="fragment custom blur " -->
+- Backups, snapshots can be wide open by mistake...<!-- .element: class="fragment custom blur " -->
 
-[https://github.com/SummitRoute/aws_exposable_resources](https://github.com/SummitRoute/aws_exposable_resources)
+---
+### AWS exposable resources
+
+- Resources that could be indirectly exposed through another resource are not included.
+- Some resources may require multiple things configured a certain way to be considered public.
+
+> [https://github.com/SummitRoute/aws_exposable_resources](https://github.com/SummitRoute/aws_exposable_resources)
 
 
 ---
-### Perform an inventory
+### AWS exposable resources
 
-#### Verify the configuration of each resource. 
+|     |     |
+| --- | --- |
+| Resources that can be made public through resource policies | - ECR Repository<br>- Lambda<br>- Lambda layer<br>- Serverless Application Repository<br>- Backup<br>- EFS<br>- Glacier<br>- S3<br>- IAM Role<br>- KMS Keys<br>- Secrets Managers<br>- CloudWatch Logs<br>- EventBridge<br>- MediaStore<br>- ElasticSearch<br>- Glue<br>- SNS<br>- SQS<br>- SES |
+| Resource that can be made public through sharing APIs | - AMI<br>- FPGA image<br>- EBS snapshot<br>- RDS snapshot<br>- RDS DB Cluster snapshot |
+| Resources that can be made public through network access | - API Gateway<br>- CloudFront<br>- Redshift<br>- RDS<br>- EC2<br>- Elastic IP<br>- ECS<br>- Global Accelerator<br>- ELB<br>- Lightsail<br>- Neptune<br>- ElasticCache<br>- EMR|
+<!-- .element: style="font-size: .5em"-->
 
-Verification can be tedious, use automation tools to detect misconfigurations (static based like checkov, trivy, semgrep) or dynamic based on roles.
+
+---
+### AWS EFS inside a VPC (by design)
+
+- By default, no access policy
+- `nfs-ls "nfs://fs-random.efs.blah/?version=4"`
+
+
+---
+### GCP?
+
+- API Gateway
+- Big Query
+- Big Table
+- Cloud Run
+- Cloud Tasks
+- Cloud Build
+- Cloud Deploy
+- Cloud Functions
+- Compute
+- Dataplex
+- Dataproc
+- GKE
+- IaP
+- Storage
+- Spanner
+- Etc
+
+> [https://github.com/JOSHUAJEBARAJ/gcp_exposable_resources](https://github.com/JOSHUAJEBARAJ/gcp_exposable_resources)
+
+
+---
+### 1. Perform an inventory
+
+> Verify the configuration of each resource.
+
+Verification can be tedious, use automation tools to detect misconfigurations (static based like checkov, trivy, semgrep) or dynamic based on roles. (CSPMs)
 
 More info: https://cloud.hacktricks.xyz/pentesting-cloud/pentesting-cloud-methodology
+
+
+---
+### 2. Tag Enforcement
+
+- Allow only tagged resources to be public:
+
+> PublicResource: "images for project ABC"
+
+- Not tagged, not created
+
+
+---
+### 3. Notification
+
+- Notify teams and service owners
 
 
 ---
@@ -190,9 +297,17 @@ More info: https://cloud.hacktricks.xyz/pentesting-cloud/pentesting-cloud-method
 
 
 ---
-### You lease/delete an IP or a domain, but still has references
+### Fighting with pointers, but is not C
 
-AWS S3 bucket  takeover
+- Services that point to no-existing/no-where:
+  - Resources with unique names inside the CSP, was deleted but has references
+  - Resources that are released but still has references
+
+
+---
+### Common takeovers
+
+AWS S3 bucket takeover
 [https://infosecwriteups.com/aws-s3-subdomain-takeover-79d705cc3553](https://infosecwriteups.com/aws-s3-subdomain-takeover-79d705cc3553)
 
 AWS EIP takeover
@@ -203,6 +318,23 @@ GCP Storage takeover (and more)
 
 
 ---
+### Funny takeovers
+
+- NS Takeover
+  - A CSP host a zone and points to another zone in a different CSP or CDN (NS Record)
+  - dig +trace
+  - PWNABLE
+
+- Double CNAME for S3
+  - A static website is hosted in S3
+  - A CNAME points to s3 subdomain static
+  - Another CNAME points to s3 subdomain
+  - PWNABLE
+
+
+---
+### How to spot them and probably apply a fix
+
 ![SOAR](./img/eventdriven.png)
 
 [https://aws.amazon.com/blogs/security/automated-response-and-remediation-with-aws-security-hub/](https://aws.amazon.com/blogs/security/automated-response-and-remediation-with-aws-security-hub/)
@@ -247,6 +379,7 @@ Source: https://www.tenable.com/blog/confusedfunction-a-privilege-escalation-vul
 
 
 ---
+<!-- .slide: data-background="./_assets/img/bug2.webp"; data-background-size="10%"; data-background-position="95% 85%"; -->
 ### Least Privilege
 
 Don't go forward to "*", start with some Get or List, if apply.
@@ -327,6 +460,7 @@ Create custom roles (GCP)
 
 
 ---
+<!-- .slide: data-background="./_assets/img/bug3.webp"; data-background-size="10%"; data-background-position="5% 85%"; -->
 ### When things goes wrong? Who we are gonna call?
 
 - Metadata
@@ -357,6 +491,32 @@ Create custom roles (GCP)
 
 
 ---
+### AWS CloudTrail cheat sheet
+
+"Initial Access"|"Execution"|"Persistence"|"Privilege Escalation"|"Defense Evasion"|"Credential Access"|"Discovery"|"Lateral Movement"|"Exfiltration"|"Impact"
+--- | --- | --- | --- | --- | --- | --- | --- | --- | ---
+ConsoleLogin|StartInstance|CreateAccessKey|CreateGroup|StopLogging|GetSecretValue|ListUsers|AssumeRole|CreateSnapShot|PutBucketVersioning
+PasswordRecoveryRequested|StartInstances|CreateUser|CreateRole|DeleteTrail|GetPasswordData|ListRoles|SwitchRole|ModifySnapshotAttributes |RunInstances
+|Invoke|CreateNetworkAclEntry|UpdateAccessKey|UpdateTrail|RequestCertificate|ListIdentities||ModifyImageAttribute|DeleteAccountPublicAccessBlock 
+|SendCommand|CreateRoute|PutGroupPolicy|PutEventSelectors|UpdateAssumeRolePolicy|ListAccessKeys||SharedSnapshotCopyInitiated|
+||CreateLoginProfile|PutRolePolicy|DeleteFlowLogs||ListServiceQuotas||SharedSnapshotVolumeCreated|
+||AuthorizeSecurityGroupEgress|PutUserPolicy|DeleteDetector||ListInstanceProfiles||ModifyDBSnapshotAttribute|
+||AuthorizeSecurityGroupIngress|AddRoleToInstanceProfile|DeleteMembers||ListBuckets||PutBucketPolicy|
+||CreateVirtualMFADevice|AddUserToGroup|DeleteSnapshot||ListGroups||PutBucketAcl|
+||CreateConnection||DeactivateMFADevice||GetSendQuota|||
+||ApplySecurityGroupsToLoadBalancer||DeleteCertificate||GetCallerIdentity|||
+||SetSecurityGroups||DeleteConfigRule||DescribeInstances|||
+||AuthorizeDBSecurityGroupIngress||DeleteAccessKey||GetBucketAcl|||
+||CreateDBSecurityGroup||LeaveOrganization||GetBucketVersioning|||
+||ChangePassword||DisassociateFromMasterAccount||GetAccountAuthorizationDetails|||
+||||DisassociateMembers|||||
+||||StopMonitoringMembers|||||
+<!-- .element: style="font-size: .4em"-->
+
+> [https://www.invictus-ir.com/news/aws-cloudtrail-cheat-sheet](https://www.invictus-ir.com/news/aws-cloudtrail-cheat-sheet)
+
+
+---
 <!-- .slide: data-background="./_assets/img/bg.png"; data-state="hide-menubar"; data-name="Enforcement"; -->
 ## Enforcement
 
@@ -364,6 +524,7 @@ Create custom roles (GCP)
 
 
 ---
+<!-- .slide: data-background="./_assets/img/bug1.webp"; data-background-size="10%"; data-background-position="95% 15%"; -->
 ### They call it: Killer Bot
 
 Detect changes on the environments, cross the cloud or inner the cloud. Someone tried to spin up a new instance without following the business practices or a new bucket is exposed without an explanation.
@@ -379,7 +540,20 @@ More info: https://github.com/hysnsec/awesome-policy-as-code
 <!-- .slide: data-background="./_assets/img/bg.png"; data-state="hide-menubar"; data-name="DevOps"; -->
 ## DevOps
 
-#### R.O.S.I.<!-- .element: class="fragment animate__flipInX" -->
+#### R.O.S.I. (Return on Security Investment)?<!-- .element: class="fragment animate__flipInX" -->
+
+
+---
+### DevOps Security Challenges
+
+DevOps involves the adoption of iterative software development, automation, and the use of programmable, declarative infrastructure. DevOps security issues often stem from conflicts between the different goals of developers and security teams. While the developer's goal is to get software into the pipeline as quickly as possible, security teams want to eliminate as many potential security flaws as possible.
+
+- DevOps Teams Don’t Have Time for Security
+- Cloud Security
+- DevOps Toolsets Can Be Risky
+- Weak Access Controls
+
+> [https://www.hackerone.com/knowledge-center/devops-security-challenges-and-6-critical-best-practices](https://www.hackerone.com/knowledge-center/devops-security-challenges-and-6-critical-best-practices)
 
 
 ---
