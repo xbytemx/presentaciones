@@ -299,9 +299,9 @@ More info: https://cloud.hacktricks.xyz/pentesting-cloud/pentesting-cloud-method
 ---
 ### Fighting with pointers, but is not C
 
-- Services that point to no-existing/no-where:
-  - Resources with unique names inside the CSP, was deleted but has references
-  - Resources that are released but still has references
+- Services that point to no-existing/no-where:<!-- .element: class="fragment" -->
+  - Resources with unique names inside the CSP, was deleted but has references<!-- .element: class="fragment" -->
+  - Resources that are released but still has references<!-- .element: class="fragment" -->
 
 
 ---
@@ -318,18 +318,25 @@ GCP Storage takeover (and more)
 
 
 ---
-### Funny takeovers
+### Funny takeovers (1/2)
 
-- NS Takeover
-  - A CSP host a zone and points to another zone in a different CSP or CDN (NS Record)
-  - dig +trace
-  - PWNABLE
+- A CSP host a zone and points to another zone in a different CSP or CDN (NS Record)<!-- .element: class="fragment" -->
+- dig +trace<!-- .element: class="fragment" -->
+- PWNED!<!-- .element: class="fragment" -->
 
-- Double CNAME for S3
-  - A static website is hosted in S3
-  - A CNAME points to s3 subdomain static
-  - Another CNAME points to s3 subdomain
-  - PWNABLE
+
+---
+### Funny takeovers (2/2)
+- CNAMEs and S3 static website<!-- .element: class="fragment" -->
+  - A static website is hosted in S3<!-- .element: class="fragment" -->
+  - A CNAME dev.concebolla.cochinita.com points to s3-website-us-west-1.amazonaws.com<!-- .element: class="fragment" -->
+  - Another CNAME yahayhambre.org points to first CNAME<!-- .element: class="fragment" -->
+  - PWNABLE<!-- .element: class="fragment highlight-red" -->
+<!-- .element: class="fragment" -->
+
+![S3 and CNAMEs](./img/warn1.png)<!-- .element: class="fragment" -->
+
+> [https://docs.aws.amazon.com/AmazonS3/latest/userguide/VirtualHosting.html#VirtualHostingCustomURLs](https://docs.aws.amazon.com/AmazonS3/latest/userguide/VirtualHosting.html#VirtualHostingCustomURLs)<!-- .element: class="fragment" -->
 
 
 ---
@@ -434,6 +441,15 @@ Create custom roles (GCP)
 
 
 ---
+### Easy AWS IAM Audit
+
+- python scripts using botocore for validations<!-- .element: class="fragment" -->
+- AWS SSM<!-- .element: class="fragment" -->
+- Audit Roles on each accounts<!-- .element: class="fragment" -->
+- Easy right?<!-- .element: class="fragment" -->
+
+
+---
 <!-- .slide: data-background="./_assets/img/bg.png"; data-state="hide-menubar"; data-name="Secure Baseline"; -->
 ## Secure Baseline
 
@@ -450,6 +466,28 @@ Create custom roles (GCP)
 - Evaluate one, fix multiple
 - Made security easy to adopt at Org Level
 - Defines a base cost for security
+
+
+---
+### Secure based images
+
+- Environment for building and testing in every CSP
+- Dev images and prod images
+- Trusted accounts/projects/subscription for security images
+- CIS Benchmarks and security agents/tools for every image
+- Permissions to access encrypted images
+- Registrer every image into a centralized platform (call home please)
+- Instances should perform a selftagging step
+- OpenScap and scripts that validates every image (verification)
+
+
+---
+<!-- .slide: data-background="./_assets/img/bug2.webp"; data-background-size="10%"; data-background-position="95% 85%"; -->
+### Org policies
+
+- Baseline of policies
+- AWS Guarduty (security AWS Account)
+- Trusted external accounts
 
 
 ---
@@ -478,6 +516,31 @@ Create custom roles (GCP)
 
 
 ---
+### GitOps
+
+123456789012.yaml
+
+```yaml
+team: Infosec
+devops:
+  - benito.juarez@mexico.security
+  - miguel.hidalgo@mexico.security
+admin:
+  - batman@baticueva.bat
+```
+
+
+---
+<!-- .slide: data-background="./_assets/img/rocket-bug.webp"; data-background-size="10%"; data-background-position="95% 15%"; -->
+### Service IDs, Product IDs
+
+- Tag Policy
+  - Default tags
+  - Tags based on resource type
+  - Infosec Tags
+
+
+---
 <!-- .slide: data-background="./_assets/img/bg.png"; data-state="hide-menubar"; data-name="Leaks"; -->
 ## Leaks
 
@@ -485,7 +548,7 @@ Create custom roles (GCP)
 
 
 ---
-![Fishing](./img/fishing.png)
+![Phishing](./img/fishing.png)
 
 [https://aws.amazon.com/blogs/security/how-to-detect-suspicious-activity-in-your-aws-account-by-using-private-decoy-resources/](https://aws.amazon.com/blogs/security/how-to-detect-suspicious-activity-in-your-aws-account-by-using-private-decoy-resources/)
 
@@ -554,6 +617,8 @@ DevOps involves the adoption of iterative software development, automation, and 
 - Weak Access Controls
 
 > [https://www.hackerone.com/knowledge-center/devops-security-challenges-and-6-critical-best-practices](https://www.hackerone.com/knowledge-center/devops-security-challenges-and-6-critical-best-practices)
+
+### Security Engineering<!-- .element: class="fragment animate__flipInX" -->
 
 
 ---
