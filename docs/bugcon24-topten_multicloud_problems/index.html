@@ -9,10 +9,10 @@
   <link rel="shortcut icon" href="./favicon.ico" />
   <link rel="stylesheet" href="./dist/reset.css" />
   <link rel="stylesheet" href="./dist/reveal.css" />
-  <link rel="stylesheet" href="./_assets/css/night.css" id="theme" />
+  <link rel="stylesheet" href="./assets/css/night.css" id="theme" />
   <link rel="stylesheet" href="./css/highlight/monokai.css" />
 
-  <link rel="stylesheet" href="./_assets/css/style.css" />
+  <link rel="stylesheet" href="./assets/css/style.css" />
 </head>
 
 <body>
@@ -23,14 +23,14 @@
     <div class="slides">
       <section data-markdown data-separator="\r?\n---\r?\n" data-separator-vertical="\r?\n----\r?\n">
         <textarea data-template>
-          <!-- .slide: data-background="./_assets/img/bg.png"; data-state="hide-menubar"; -->
+          <!-- .slide: data-background="./assets/img/bg.png"; data-state="hide-menubar"; -->
 # 10 ways to **\<redacted\>**<!-- .element: class="fragment custom blur " --> in a MultiCloud Environment
 
 ---
 <!-- .slide: data-state="hide-menubar"; -->
 ## $ whoami
 
-<div> 👋 From Yucatán <img src="./_assets/img/bandera.jpg" alt="bandera de la hermana republica :v" width="3%" height="auto"><BR><img src="./_assets/img/tacos.jpg" alt="" width="15%" height="auto"> <img src="./_assets/img/playa.jpg" alt="" width="15%" height="auto"> <img src="./_assets/img/ceviche.jpg" alt="" width="15%" height="auto"> <img src="./_assets/img/mtb.jpg" alt="" width="11%" height="auto"> <img src="./_assets/img/yucatux.jpg" alt="" width="8%" height="auto"> <img src="./_assets/img/chuburna.jpg" alt="" width="15%" height="auto"></div><!-- .element: class="fragment" -->
+<div> 👋 From Yucatán <img src="./assets/img/bandera.jpg" alt="bandera de la hermana republica :v" width="3%" height="auto"><BR><img src="./assets/img/tacos.jpg" alt="" width="15%" height="auto"> <img src="./assets/img/playa.jpg" alt="" width="15%" height="auto"> <img src="./assets/img/ceviche.jpg" alt="" width="15%" height="auto"> <img src="./assets/img/mtb.jpg" alt="" width="11%" height="auto"> <img src="./assets/img/yucatux.jpg" alt="" width="8%" height="auto"> <img src="./assets/img/chuburna.jpg" alt="" width="15%" height="auto"></div><!-- .element: class="fragment" -->
 
 FLOSS (Debian since 2006) <!-- .element: class="fragment" -->
 
@@ -57,7 +57,7 @@ Lead Security Systems Engineer @ EPAM Systems <!-- .element: class="fragment" --
 
 
 ---
-<!-- .slide: data-background="./_assets/img/bg.png"; data-state="hide-menubar"; data-name="Intro"; -->
+<!-- .slide: data-background="./assets/img/bg.png"; data-state="hide-menubar"; data-name="Intro"; -->
 ## MultiCloud Security Situation
 
 #### Challenges of a secure multi-cloud approach
@@ -74,7 +74,7 @@ Lead Security Systems Engineer @ EPAM Systems <!-- .element: class="fragment" --
 
 
 ---
-<!-- .slide: data-background="./_assets/img/rocket-bug.webp"; data-background-size="10%"; data-background-position="5% 15%"; -->
+<!-- .slide: data-background="./assets/img/rocket-bug.webp"; data-background-size="10%"; data-background-position="5% 15%"; -->
 ### State of the Art
 
 <img src="./img/current-state.png" width="70%" height="auto">
@@ -114,7 +114,7 @@ Source: [Current state of Cloud Security, CSHub 2023](https://www.cshub.com/clou
 
 
 ---
-<!-- .slide: data-background="./_assets/img/bg.png"; data-state="hide-menubar"; data-name="Metadata"; -->
+<!-- .slide: data-background="./assets/img/bg.png"; data-state="hide-menubar"; data-name="Metadata"; -->
 ## Metadata Explotation
 
 #### 169.254.169.254, are you there?<!-- .element: class="fragment animate__flipInX" -->
@@ -212,7 +212,7 @@ http://169.254.169.254/metadata/instance?api-version=2021-02-01
 
 
 ---
-<!-- .slide: data-background="./_assets/img/bug1.webp"; data-background-size="10%"; data-background-position="95% 15%"; -->
+<!-- .slide: data-background="./assets/img/bug1.webp"; data-background-size="10%"; data-background-position="95% 15%"; -->
 ### IMDScape (Fixed)
 
 - EKS nodes uses IMDS to fetch the K8S api token
@@ -222,7 +222,7 @@ http://169.254.169.254/metadata/instance?api-version=2021-02-01
 
 
 ---
-<!-- .slide: data-background="./_assets/img/bg.png"; data-state="hide-menubar"; data-name="Exposed Services"; -->
+<!-- .slide: data-background="./assets/img/bg.png"; data-state="hide-menubar"; data-name="Exposed Services"; -->
 ## Exposed Services
 
 #### Public buckets and more!<!-- .element: class="fragment animate__flipInX"  -->
@@ -315,7 +315,7 @@ More info: https://cloud.hacktricks.xyz/pentesting-cloud/pentesting-cloud-method
 
 
 ---
-<!-- .slide: data-background="./_assets/img/bg.png"; data-state="hide-menubar"; data-name="Takeovers"; -->
+<!-- .slide: data-background="./assets/img/bg.png"; data-state="hide-menubar"; data-name="Takeovers"; -->
 ## Takerovers
 
 #### Sorry, that was yours? :D<!-- .element: class="fragment animate__flipInX" -->
@@ -373,7 +373,7 @@ GCP Storage takeover (and more)
 
 
 ---
-<!-- .slide: data-background="./_assets/img/bg.png"; data-state="hide-menubar"; data-name="Overpermissive"; -->
+<!-- .slide: data-background="./assets/img/bg.png"; data-state="hide-menubar"; data-name="Overpermissive"; -->
 ## Overpermissive
 
 #### \*:\*<!-- .element: class="fragment animate__flipInX"  -->
@@ -411,7 +411,7 @@ Source: https://www.tenable.com/blog/confusedfunction-a-privilege-escalation-vul
 
 
 ---
-<!-- .slide: data-background="./_assets/img/bug2.webp"; data-background-size="10%"; data-background-position="95% 85%"; -->
+<!-- .slide: data-background="./assets/img/bug2.webp"; data-background-size="10%"; data-background-position="95% 85%"; -->
 ### Least Privilege
 
 Don't go forward to "*", start with some Get or List, if apply.
@@ -426,7 +426,7 @@ Create custom roles (GCP)
 
 
 ---
-<!-- .slide: data-background="./_assets/img/bg.png"; data-state="hide-menubar"; data-name="Until"; -->
+<!-- .slide: data-background="./assets/img/bg.png"; data-state="hide-menubar"; data-name="Until"; -->
 ## Until You Remember
 
 #### Used 450 days ago. 800 days old.<!-- .element: class="fragment animate__flipInX" -->
@@ -475,7 +475,7 @@ Create custom roles (GCP)
 
 
 ---
-<!-- .slide: data-background="./_assets/img/bg.png"; data-state="hide-menubar"; data-name="Secure Baseline"; -->
+<!-- .slide: data-background="./assets/img/bg.png"; data-state="hide-menubar"; data-name="Secure Baseline"; -->
 ## Secure Baseline
 
 #### Copy & Paste<!-- .element: class="fragment animate__flipInX"  -->
@@ -507,7 +507,7 @@ Create custom roles (GCP)
 
 
 ---
-<!-- .slide: data-background="./_assets/img/bug2.webp"; data-background-size="10%"; data-background-position="95% 85%"; -->
+<!-- .slide: data-background="./assets/img/bug2.webp"; data-background-size="10%"; data-background-position="95% 85%"; -->
 ### Org policies
 
 - Baseline of policies
@@ -516,14 +516,14 @@ Create custom roles (GCP)
 
 
 ---
-<!-- .slide: data-background="./_assets/img/bg.png"; data-state="hide-menubar"; data-name="Ownership"; -->
+<!-- .slide: data-background="./assets/img/bg.png"; data-state="hide-menubar"; data-name="Ownership"; -->
 ## Ownership
 
 #### He/She is not working at the company anymore.<!-- .element: class="fragment animate__flipInX" -->
 
 
 ---
-<!-- .slide: data-background="./_assets/img/bug3.webp"; data-background-size="10%"; data-background-position="5% 85%"; -->
+<!-- .slide: data-background="./assets/img/bug3.webp"; data-background-size="10%"; data-background-position="5% 85%"; -->
 ### When things goes wrong? Who we are gonna call?
 
 - Metadata
@@ -556,7 +556,7 @@ admin:
 
 
 ---
-<!-- .slide: data-background="./_assets/img/rocket-bug.webp"; data-background-size="10%"; data-background-position="95% 15%"; -->
+<!-- .slide: data-background="./assets/img/rocket-bug.webp"; data-background-size="10%"; data-background-position="95% 15%"; -->
 ### Service IDs, Product IDs
 
 - Tag Policy
@@ -566,7 +566,7 @@ admin:
 
 
 ---
-<!-- .slide: data-background="./_assets/img/bg.png"; data-state="hide-menubar"; data-name="Leaks"; -->
+<!-- .slide: data-background="./assets/img/bg.png"; data-state="hide-menubar"; data-name="Leaks"; -->
 ## Leaks
 
 #### Oh no ...<!-- .element: class="fragment animate__flipInX" -->
@@ -605,14 +605,14 @@ PasswordRecoveryRequested|StartInstances|CreateUser|CreateRole|DeleteTrail|GetPa
 
 
 ---
-<!-- .slide: data-background="./_assets/img/bg.png"; data-state="hide-menubar"; data-name="Enforcement"; -->
+<!-- .slide: data-background="./assets/img/bg.png"; data-state="hide-menubar"; data-name="Enforcement"; -->
 ## Enforcement
 
 #### Cloud security policies everywhere<!-- .element: class="fragment animate__flipInX"  -->
 
 
 ---
-<!-- .slide: data-background="./_assets/img/bug1.webp"; data-background-size="10%"; data-background-position="95% 15%"; -->
+<!-- .slide: data-background="./assets/img/bug1.webp"; data-background-size="10%"; data-background-position="95% 15%"; -->
 ### They call it: Killer Bot
 
 Detect changes on the environments, cross the cloud or inner the cloud. Someone tried to spin up a new instance without following the business practices or a new bucket is exposed without an explanation.
@@ -625,7 +625,7 @@ More info: https://github.com/hysnsec/awesome-policy-as-code
 
 
 ---
-<!-- .slide: data-background="./_assets/img/bg.png"; data-state="hide-menubar"; data-name="DevOps"; -->
+<!-- .slide: data-background="./assets/img/bg.png"; data-state="hide-menubar"; data-name="DevOps"; -->
 ## DevOps
 
 #### R.O.S.I. (Return on Security Investment)?<!-- .element: class="fragment animate__flipInX" -->
@@ -715,10 +715,10 @@ DevOps involves the adoption of iterative software development, automation, and 
     var options = extend(defaultOptions, {"simplemenu":{"scale":0.5,"flat":true},"drawer":{"toggleDrawKey":"d","toggleBoardKey":"t","colors":["#fa1e0e","#8ac926","#1982c4","#ffca3a"],"color":"#FF0000","pathSize":4},"width":1920,"height":1080,"transition":"slide","controls":false,"slideNumber":false,"_":["content/main.md"],"static":"public","static-dirs":"img","staticDirs":"img"}, queryOptions);
   </script>
 
-  <script src="./_assets/plugin/simplemenu/simplemenu.js"></script>
-  <script src="./_assets/plugin/drawer/drawer.js"></script>
-  <script src="./_assets/plugin/appearance/appearance.js"></script>
-  <script src="./_assets/plugin.js"></script>
+  <script src="./assets/plugin/simplemenu/simplemenu.js"></script>
+  <script src="./assets/plugin/drawer/drawer.js"></script>
+  <script src="./assets/plugin/appearance/appearance.js"></script>
+  <script src="./assets/plugin.js"></script>
 
   <script>
     Reveal.initialize(options);
