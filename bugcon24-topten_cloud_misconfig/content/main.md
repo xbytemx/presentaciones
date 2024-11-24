@@ -1,5 +1,5 @@
 <!-- .slide: data-background="./_assets/img/bg.png"; data-state="hide-menubar"; -->
-# 10 ways to \<redacted\> in a MultiCloud Environment
+# 10 ways to **\<redacted\>**<!-- .element: class="fragment custom blur " --> in a MultiCloud Environment
 
 ---
 <!-- .slide: data-state="hide-menubar"; -->
